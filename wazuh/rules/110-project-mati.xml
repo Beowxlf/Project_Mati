@@ -1,0 +1,49 @@
+<!-- Project_Mati reviewed-native Wazuh rules. Raw telemetry remains in Wazuh. -->
+<group name="project_mati,">
+  <rule id="110100" level="0">
+    <if_sid>60103</if_sid>
+    <field name="win.system.eventID">^4688$</field>
+    <field name="win.eventdata.newProcessName" type="pcre2">(?i)\\(?:powershell|pwsh)\.exe$</field>
+    <description>Project_Mati PowerShell process candidate</description>
+    <options>no_log</options>
+  </rule>
+
+  <rule id="110101" level="12">
+    <if_sid>110100</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:^|\s)-(?:enc|encodedcommand)(?:\s|$)|DownloadString.{0,512}(?:Invoke-Expression|IEX)</field>
+    <description>PM-WIN-PS-001 v1.0.0 Suspicious PowerShell encoded or download execution</description>
+    <mitre><id>T1059.001</id></mitre>
+    <group>project_mati,powershell,execution,</group>
+  </rule>
+
+  <rule id="110110" level="0">
+    <if_sid>61100</if_sid>
+    <field name="win.system.eventID">^7045$</field>
+    <description>Project_Mati service creation candidate</description>
+    <options>no_log</options>
+  </rule>
+
+  <rule id="110111" level="12">
+    <if_sid>110110</if_sid>
+    <field name="win.eventdata.serviceFileName" type="pcre2">(?i)\\(?:Users\\Public|AppData\\Local\\Temp|Windows\\Temp|ADMIN\$)\\|\\(?:powershell|cmd|rundll32)\.exe(?:\s|$)</field>
+    <description>PM-WIN-SVC-001 v1.0.0 Suspicious Windows service image path</description>
+    <mitre><id>T1543.003</id></mitre>
+    <group>project_mati,windows_service,persistence,privilege_escalation,</group>
+  </rule>
+
+  <rule id="110121" level="14">
+    <if_sid>110100</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:Set-MpPreference\s+-Disable(?:Realtime|Behavior)Monitoring\s+\$true|(?:Add|Set)-MpPreference\s+-ExclusionPath\s+C:\\(?:\s|$))</field>
+    <description>PM-WIN-DEF-001 v1.0.0 Microsoft Defender protection reduction command</description>
+    <mitre><id>T1562.001</id></mitre>
+    <group>project_mati,defender,defense_evasion,</group>
+  </rule>
+
+  <rule id="110131" level="12">
+    <if_sid>5400</if_sid>
+    <regex type="pcre2">(?i)USER=root\s*;.*COMMAND=(?:/bin/(?:ba)?sh|/usr/bin/dash)(?:\s|$)|USER=root\s*;.*COMMAND=/usr/bin/(?:chmod\s+u\+s|chown\s+root)(?:\s|$)</regex>
+    <description>PM-LNX-PRIV-001 v1.0.0 Sudo starts a root shell or changes privileged file ownership</description>
+    <mitre><id>T1548.003</id></mitre>
+    <group>project_mati,sudo,privilege_escalation,</group>
+  </rule>
+</group>

@@ -1,25 +1,31 @@
-title: Windows Defender Bypass Detection
-id: edr-win-defender-bypass
-status: experimental
-description: Detects common techniques used to bypass or disable Windows Defender
+title: Microsoft Defender Protection Reduction Command
+id: c73a1bd4-b9c7-4b74-a9ee-ec2e2459e2bb
+status: test
+description: Detects explicit PowerShell commands that disable Defender protection or add broad exclusions.
 author: Beowxlf
+date: 2026-09-11
 references:
   - https://attack.mitre.org/techniques/T1562/001/
 logsource:
   product: windows
   service: security
 detection:
-  selection:
-    EventID: 4688
+  process:
     NewProcessName|contains:
-      - "MpCmdRun"
-      - "powershell.exe -Command Set-MpPreference"
-      - "Add-MpPreference -ExclusionPath"
-  condition: selection
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  command:
+    ProcessCommandLine|contains:
+      - 'Set-MpPreference -DisableRealtimeMonitoring $true'
+      - 'Set-MpPreference -DisableBehaviorMonitoring $true'
+      - 'Add-MpPreference -ExclusionPath C:\'
+      - 'Set-MpPreference -ExclusionPath C:\'
+  condition: process and command
 falsepositives:
-  - Administrator maintenance
-level: high
+  - Time-bounded troubleshooting under an approved change that is immediately reverted
+level: critical
 tags:
   - attack.defense_evasion
   - attack.t1562.001
-
+x_detection_id: PM-WIN-DEF-001
+x_detection_version: 1.0.0

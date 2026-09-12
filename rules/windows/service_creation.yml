@@ -1,21 +1,41 @@
-title: Windows Service Creation
-id: win-service-creation
-status: stable
-description: Detects the creation of new services in Windows which can be abused for persistence or privilege escalation.
+title: Suspicious Windows Service Image Path
+id: 7ecb7130-d2f6-40ec-a0dc-d62d11b5db55
+status: test
+description: Detects service installation when the image path uses a user-writable, temporary, UNC, or proxy-execution location.
 author: Beowxlf
+date: 2026-09-11
 references:
   - https://attack.mitre.org/techniques/T1543/003/
 logsource:
   product: windows
-  service: security
+  service: system
 detection:
-  selection:
+  event:
     EventID: 7045
-  condition: selection
+  suspicious_path:
+    ImagePath|contains:
+      - '\Users\Public\'
+      - '\AppData\Local\Temp\'
+      - '\Windows\Temp\'
+      - '\ADMIN$\'
+      - '\powershell.exe'
+      - '\cmd.exe /c'
+      - '\rundll32.exe'
+    ServiceFileName|contains:
+      - '\Users\Public\'
+      - '\AppData\Local\Temp\'
+      - '\Windows\Temp\'
+      - '\ADMIN$\'
+      - '\powershell.exe'
+      - '\cmd.exe /c'
+      - '\rundll32.exe'
+  condition: event and suspicious_path
 falsepositives:
-  - Legitimate service installs
-level: medium
+  - A reviewed installer that temporarily stages a signed service binary in Windows Temp
+level: high
 tags:
   - attack.persistence
+  - attack.privilege_escalation
   - attack.t1543.003
-
+x_detection_id: PM-WIN-SVC-001
+x_detection_version: 1.0.0

@@ -1,0 +1,31 @@
+title: Sudo Starts a Root Shell or Changes Privileged File Ownership
+id: 6b479ca8-4178-467e-8dfa-db664e1d75b8
+status: test
+description: Detects sudo commands that start a shell as root or change ownership or setuid state on privileged files.
+author: Beowxlf
+date: 2026-09-11
+references:
+  - https://attack.mitre.org/techniques/T1548/003/
+logsource:
+  product: linux
+  service: auth
+detection:
+  sudo_root:
+    program: sudo
+    dstuser: root
+  command:
+    command|contains:
+      - 'COMMAND=/bin/sh'
+      - 'COMMAND=/bin/bash'
+      - 'COMMAND=/usr/bin/dash'
+      - 'COMMAND=/usr/bin/chmod u+s'
+      - 'COMMAND=/usr/bin/chown root'
+  condition: sudo_root and command
+falsepositives:
+  - Approved emergency maintenance that explicitly starts a root shell
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.t1548.003
+x_detection_id: PM-LNX-PRIV-001
+x_detection_version: 1.0.0

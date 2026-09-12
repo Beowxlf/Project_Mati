@@ -1,25 +1,42 @@
-title: Suspicious PowerShell Execution
-id: win-suspicious-powershell
-status: stable
-description: Detects potentially suspicious PowerShell commands often used in attacks.
+title: Suspicious PowerShell Encoded or Download Execution
+id: b88cd06c-4221-4d29-9c69-0d5ca38e4f78
+status: test
+description: Detects PowerShell process creation with encoded commands or a download followed by in-memory execution.
 author: Beowxlf
+date: 2026-09-11
 references:
   - https://attack.mitre.org/techniques/T1059/001/
 logsource:
   product: windows
-  service: powershell
+  category: process_creation
 detection:
-  selection:
-    ScriptBlockText|contains:
-      - "Invoke-Expression"
-      - "IEX"
-      - "Net.WebClient"
-      - "DownloadString"
-  condition: selection
+  image:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+    NewProcessName|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  encoded:
+    CommandLine|contains:
+      - ' -enc '
+      - ' -encodedcommand '
+    ProcessCommandLine|contains:
+      - ' -enc '
+      - ' -encodedcommand '
+  download_execute:
+    CommandLine|contains|all:
+      - 'DownloadString'
+      - 'Invoke-Expression'
+    ProcessCommandLine|contains|all:
+      - 'DownloadString'
+      - 'Invoke-Expression'
+  condition: image and (encoded or download_execute)
 falsepositives:
-  - Administrator scripting
+  - Approved software deployment that intentionally uses encoded PowerShell
 level: high
 tags:
   - attack.execution
   - attack.t1059.001
-
+x_detection_id: PM-WIN-PS-001
+x_detection_version: 1.0.0
