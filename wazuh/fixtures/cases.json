@@ -1,0 +1,10 @@
+[
+  {"name":"encoded PowerShell","expect":"110101","fields":{"win.system.eventID":"4688","win.eventdata.newProcessName":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","win.eventdata.commandLine":"powershell.exe -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQA"}},
+  {"name":"ordinary PowerShell admin","expect":null,"fields":{"win.system.eventID":"4688","win.eventdata.newProcessName":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","win.eventdata.commandLine":"powershell.exe Get-Service W32Time"}},
+  {"name":"suspicious service path","expect":"110111","fields":{"win.system.eventID":"7045","win.eventdata.serviceFileName":"C:\\Users\\Public\\ng-test.exe"}},
+  {"name":"normal vendor service","expect":null,"fields":{"win.system.eventID":"7045","win.eventdata.serviceFileName":"C:\\Program Files\\Vendor\\agent.exe"}},
+  {"name":"disable Defender","expect":"110121","fields":{"win.system.eventID":"4688","win.eventdata.newProcessName":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","win.eventdata.commandLine":"powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true"}},
+  {"name":"Defender status query","expect":null,"fields":{"win.system.eventID":"4688","win.eventdata.newProcessName":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","win.eventdata.commandLine":"powershell.exe Get-MpComputerStatus"}},
+  {"name":"sudo root shell","decoder":"sudo","expect":"110131","fields":{"srcuser":"analyst","dstuser":"root","command":"/bin/sh -c true"}},
+  {"name":"routine sudo package query","decoder":"sudo","expect":null,"fields":{"srcuser":"analyst","dstuser":"root","command":"/usr/bin/apt-get update"}}
+]

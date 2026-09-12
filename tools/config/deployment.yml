@@ -1,0 +1,9 @@
+schema: 1
+authoritative_source: rules
+target: wazuh
+deployable_rules: wazuh/rules/110-project-mati.xml
+validation_manifest: wazuh/project-mati-detections.json
+fixtures: wazuh/fixtures
+conversion:
+  mode: reviewed-native
+  reason: Wazuh XML is maintained and tested explicitly because a Sigma-to-Wazuh backend is not part of this repository.

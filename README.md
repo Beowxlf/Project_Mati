@@ -1,5 +1,7 @@
 # Project_Mati
 
+Project_Mati is the authoritative detection source for the NorthGate Wazuh-to-case workflow. Reviewed Sigma intent is under `rules/`; deployable Wazuh XML, the detection manifest, and validation fixtures are under `wazuh/`. See `docs/Detections.md` for telemetry, ATT&CK, false-positive, tuning, and investigation guidance.
+
 **Project_Mati** is a detection engineering repository that combines Sigma detection rules, adversary simulation labs, and structured technical notes. The goal is to develop comprehensive detection capabilities mapped to the MITRE ATT&CK framework, supported by deep technical knowledge of Windows internals, network protocols, and logging systems.
 
 ---
