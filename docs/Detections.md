@@ -2,7 +2,9 @@
 
 Project_Mati is the authoritative source. The Sigma files express detection intent; `wazuh/rules/110-project-mati.xml` is the reviewed deployment artifact. Wazuh retains raw endpoint telemetry. NorthGate RMM receives only allowlisted alert context.
 
-No supporting decoder is required for this release: Windows events use Wazuh's `windows_eventchannel` decoder and Linux sudo events use its `sudo` decoder. Field names were checked against the NorthGate canaries before deployment; the Windows rules require Security 4688 command-line auditing and System 7045 collection, while Linux requires auth log collection.
+Windows events use Wazuh's `windows_eventchannel` decoder and Linux sudo events use its `sudo` decoder. The website release adds normalized Caddy/nginx JSON fields and the focused `wazuh/decoders/110-project-mati-sysmon-linux.xml` decoder. Field names must be checked against each NorthGate canary before promotion.
+
+The OWASP Top 10:2025 rules, including purpose, telemetry, mapping, severity, false positives, tuning and investigation guidance, are documented in [OWASP-Top-10-Web-Detections.md](OWASP-Top-10-Web-Detections.md). Deployment and Sysmon scope are in [Web-Detection-Deployment.md](Web-Detection-Deployment.md).
 
 ## PM-WIN-PS-001 v1.0.0 — Suspicious PowerShell encoded or download execution
 
@@ -28,12 +30,12 @@ No supporting decoder is required for this release: Windows events use Wazuh's `
 - False positives: approved, time-bounded troubleshooting that is reverted. Tune only on a documented change identity and window.
 - Investigate: identify actor/authorization; verify current Defender state; review adjacent execution; restore protection through an approved action if changed.
 
-## PM-LNX-PRIV-001 v1.0.0 — Sudo root shell or privileged ownership change
+## PM-LNX-PRIV-001 v1.0.2 — Sudo root shell or privileged ownership change
 
 - Purpose: find sudo starting a root shell or modifying root ownership/setuid state. Routine sudo package work does not alert.
 - Telemetry: Linux auth log decoded by Wazuh sudo fields `srcuser`, `dstuser`, and `command`.
 - ATT&CK: T1548.003, Sudo and Sudo Caching. Severity: high (Wazuh level 12).
-- False positives: approved emergency maintenance that explicitly starts a root shell. Tune by exact approved automation identity and command, not all sudo.
+- False positives: approved emergency maintenance that explicitly starts a root shell. The NorthGate `northgate-mcp` and `northgate-bootstrap` maintenance identities are explicitly excluded; deployments outside this lab must replace that allowlist with their own reviewed automation identities. Tune by exact approved identity and command, not all sudo.
 - Investigate: validate user/sudo policy; inspect exact command/PWD; review history and descendants; confirm approval.
 
 ## Validation and deployment

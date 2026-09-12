@@ -1,0 +1,17 @@
+<!-- Minimal Sysmon for Linux decoder derived from Wazuh's published integration. -->
+<decoder name="sysmon-linux"><program_name>^sysmon$</program_name></decoder>
+
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pEventID\p(\d+)\p/EventID\p</regex><order>system.eventId</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pComputer\p(\.+)\p/Computer\p</regex><order>system.computer</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="UtcTime"\p(\.+)\p/Data\p</regex><order>eventdata.utcTime</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="Image"\p(\.+)\p/Data\p</regex><order>eventdata.image</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="ParentImage"\p(\.+)\p/Data\p</regex><order>eventdata.parentImage</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="CommandLine"\p(\.+)\p/Data\p</regex><order>eventdata.commandLine</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="ParentCommandLine"\p(\.+)\p/Data\p</regex><order>eventdata.parentCommandLine</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="User"\p(\.+)\p/Data\p</regex><order>eventdata.user</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="Hashes"\p(\.+)\p/Data\p</regex><order>eventdata.hashes</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="TargetFilename"\p(\.+)\p/Data\p</regex><order>eventdata.targetFilename</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="DestinationIp"\p(\.+)\p/Data\p</regex><order>eventdata.destinationIp</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="DestinationPort"\p(\.+)\p/Data\p</regex><order>eventdata.destinationPort</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="State"\p(\.+)\p/Data\p</regex><order>eventdata.state</order></decoder>
+<decoder name="sysmon-linux-child"><parent>sysmon-linux</parent><regex offset="after_parent">\pData Name="ConfigurationFileHash"\p(\.+)\p/Data\p</regex><order>eventdata.configurationFileHash</order></decoder>

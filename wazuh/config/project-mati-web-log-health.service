@@ -1,0 +1,16 @@
+[Unit]
+Description=Project_Mati website logging health check
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/project-mati-web-log-health
+User=root
+Group=root
+LogsDirectory=project-mati
+LogsDirectoryMode=0750
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/log/project-mati

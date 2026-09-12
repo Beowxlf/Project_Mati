@@ -56,6 +56,10 @@ Detailed PDFs are available in the `/labs/` directory, documenting step-by-step 
 
 - **Rule-Writing Guide**: Process for developing effective Sigma rules.
 - **SIEM Pipeline Guide**: End-to-end data flow from log collection to alerting and SOAR integration.
+- **OWASP Top 10:2025 Detection Catalog**: Runtime web-abuse and control-failure detections with false-positive and investigation guidance.
+- **Website Detection Deployment**: Normalized Caddy/nginx fields, focused Sysmon for Linux scope, canary gates, and rollback expectations.
+
+Validate the deployable Wazuh bundle and all positive/negative fixtures with `python tools/validate_wazuh.py` (`py -3` on Windows when Python is exposed through the launcher).
 
 ---
 

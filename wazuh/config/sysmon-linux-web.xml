@@ -1,0 +1,38 @@
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>sha256</HashAlgorithms>
+  <EventFiltering>
+    <RuleGroup name="Web child processes" groupRelation="or">
+      <ProcessCreate onmatch="include">
+        <ParentImage condition="end with">/node</ParentImage>
+        <ParentImage condition="end with">/gunicorn</ParentImage>
+        <ParentImage condition="end with">/uvicorn</ParentImage>
+        <ParentImage condition="end with">/daphne</ParentImage>
+        <ParentImage condition="end with">/php-fpm</ParentImage>
+        <ParentImage condition="end with">/caddy</ParentImage>
+        <ParentImage condition="end with">/nginx</ParentImage>
+      </ProcessCreate>
+    </RuleGroup>
+    <RuleGroup name="Web application and security file creation" groupRelation="or">
+      <FileCreate onmatch="include">
+        <TargetFilename condition="begin with">/opt/</TargetFilename>
+        <TargetFilename condition="begin with">/srv/</TargetFilename>
+        <TargetFilename condition="begin with">/var/www/</TargetFilename>
+        <TargetFilename condition="begin with">/rmm/api/</TargetFilename>
+        <TargetFilename condition="begin with">/etc/nginx/</TargetFilename>
+        <TargetFilename condition="begin with">/etc/caddy/</TargetFilename>
+        <TargetFilename condition="begin with">/etc/wazuh-agent/</TargetFilename>
+        <TargetFilename condition="begin with">/etc/rsyslog</TargetFilename>
+        <TargetFilename condition="begin with">/etc/logrotate</TargetFilename>
+      </FileCreate>
+    </RuleGroup>
+    <RuleGroup name="Suspicious utility network connections" groupRelation="or">
+      <NetworkConnect onmatch="include">
+        <Image condition="end with">/curl</Image><Image condition="end with">/wget</Image>
+        <Image condition="end with">/nc</Image><Image condition="end with">/ncat</Image>
+      </NetworkConnect>
+    </RuleGroup>
+    <!-- Empty include means collect no process-termination events. Linux Sysmon
+         otherwise emits a high-volume Event ID 5 stream that adds no case context. -->
+    <ProcessTerminate onmatch="include" />
+  </EventFiltering>
+</Sysmon>

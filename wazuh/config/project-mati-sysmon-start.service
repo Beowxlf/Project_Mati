@@ -1,0 +1,11 @@
+[Unit]
+Description=Start Sysmon for Linux after boot settles
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl start sysmon.service
+ExecStartPost=/usr/bin/systemctl disable sysmon.service
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict

@@ -20,10 +20,76 @@
       "checklist": ["Confirm the initiating identity and authorization", "Check current Defender preferences and protection state", "Review adjacent process and PowerShell events", "Restore protection through an approved action if changed"]
     },
     "110131": {
-      "id": "PM-LNX-PRIV-001", "version": "1.0.0", "severity": "high",
+      "id": "PM-LNX-PRIV-001", "version": "1.0.2", "severity": "high",
       "attack": ["T1548.003"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
       "context_fields": ["srcuser", "dstuser", "command", "tty", "pwd"],
       "checklist": ["Confirm the initiating user and sudo policy", "Review the exact command and working directory", "Check shell history and child activity", "Determine whether the action was approved"]
+    },
+    "110201": {
+      "id": "PM-WEB-A02-001", "version": "1.0.0", "severity": "high", "owasp": "A02:2025 Security Misconfiguration",
+      "attack": ["T1595.002"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "request.tls.version", "status", "duration", "user_id"],
+      "checklist": ["Validate the requested path and response status", "Identify the source and adjacent requests", "Confirm the resource is not exposed", "Block or tune only with evidence"]
+    },
+    "110203": {
+      "id": "PM-WEB-A01-001", "version": "1.0.0", "severity": "high", "owasp": "A01:2025 Broken Access Control",
+      "attack": ["T1190"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "status", "duration", "user_id"],
+      "checklist": ["Review the denied endpoints and source sequence", "Check whether any adjacent request succeeded", "Identify authenticated identity when present", "Confirm access-control behavior with the application owner"]
+    },
+    "110204": {
+      "id": "PM-WEB-A04-001", "version": "1.0.0", "severity": "critical", "owasp": "A04:2025 Cryptographic Failures",
+      "attack": [], "group_by": ["endpoint", "detection_id"], "window_seconds": 1800,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "request.tls.version", "status"],
+      "checklist": ["Confirm the negotiated TLS version", "Identify the listener and client", "Verify proxy and application TLS policy", "Disable obsolete protocol support through an approved change"]
+    },
+    "110205": {
+      "id": "PM-WEB-A05-001", "version": "1.0.0", "severity": "critical", "owasp": "A05:2025 Injection",
+      "attack": ["T1190"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "status", "duration", "user_id"],
+      "checklist": ["Preserve the request and response metadata", "Review adjacent requests from the source", "Check application and database logs for execution effects", "Do not replay the payload against production data"]
+    },
+    "110207": {
+      "id": "PM-WEB-A06-001", "version": "1.0.0", "severity": "high", "owasp": "A06:2025 Insecure Design",
+      "attack": ["T1190"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "status", "duration", "user_id"],
+      "checklist": ["Identify the actor and affected objects", "Validate whether rate or workflow controls should have limited the activity", "Review authorization for each operation", "Escalate application design changes to the owner"]
+    },
+    "110209": {
+      "id": "PM-WEB-A07-001", "version": "1.0.0", "severity": "high", "owasp": "A07:2025 Authentication Failures",
+      "attack": ["T1110"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "status", "duration", "user_id"],
+      "checklist": ["Review the source, target endpoints and timing", "Identify targeted accounts only from protected identity logs", "Check for a later successful login", "Apply blocking or credential action only after validation"]
+    },
+    "110211": {
+      "id": "PM-WEB-A10-001", "version": "1.0.0", "severity": "critical", "owasp": "A10:2025 Mishandling of Exceptional Conditions",
+      "attack": ["T1499"], "group_by": ["endpoint", "detection_id"], "window_seconds": 1800,
+      "context_fields": ["request.remote_ip", "request.method", "request.uri", "request.host", "status", "duration", "user_id"],
+      "checklist": ["Correlate the failing requests with application errors", "Check availability and resource impact", "Determine whether input handling leaked information or failed open", "Capture a safe reproduction before remediation"]
+    },
+    "110221": {
+      "id": "PM-WEB-A03-001", "version": "1.0.0", "severity": "high", "owasp": "A03:2025 Software Supply Chain Failures",
+      "attack": ["T1195.002"], "group_by": ["endpoint", "detection_id"], "window_seconds": 3600,
+      "context_fields": ["system.eventId", "eventdata.utcTime", "eventdata.image", "eventdata.parentImage", "eventdata.commandLine", "eventdata.user", "eventdata.targetFilename", "eventdata.hashes"],
+      "checklist": ["Identify the changed dependency or release artifact", "Verify the process, user and approved deployment", "Compare the file with the trusted source and lockfile", "Review child processes and outbound connections"]
+    },
+    "110222": {
+      "id": "PM-WEB-A08-001", "version": "1.0.0", "severity": "critical", "owasp": "A08:2025 Software or Data Integrity Failures",
+      "attack": ["T1554"], "group_by": ["endpoint", "detection_id"], "window_seconds": 1800,
+      "context_fields": ["system.eventId", "eventdata.utcTime", "eventdata.image", "eventdata.parentImage", "eventdata.commandLine", "eventdata.user", "eventdata.targetFilename", "eventdata.hashes"],
+      "checklist": ["Preserve and hash the changed file", "Identify the process, user and deployment context", "Compare with the trusted repository or package", "Check access-control behavior after the change"]
+    },
+    "110223": {
+      "id": "PM-WEB-A09-001", "version": "1.0.0", "severity": "critical", "owasp": "A09:2025 Security Logging and Alerting Failures",
+      "attack": ["T1562.001"], "group_by": ["endpoint", "detection_id"], "window_seconds": 1800,
+      "context_fields": ["system.eventId", "eventdata.utcTime", "eventdata.image", "eventdata.parentImage", "eventdata.commandLine", "eventdata.user", "eventdata.targetFilename", "eventdata.hashes"],
+      "checklist": ["Determine which logging control changed", "Identify the process and authorizing change", "Verify collection and alert delivery remain healthy", "Restore the reviewed configuration if unauthorized"]
+    },
+    "110230": {
+      "id": "PM-WEB-A09-001", "version": "1.0.0", "severity": "critical", "owasp": "A09:2025 Security Logging and Alerting Failures",
+      "attack": ["T1562.001"], "group_by": ["endpoint", "detection_id"], "window_seconds": 1800,
+      "context_fields": ["server", "service", "log_path", "healthy", "reason", "checked_at"],
+      "checklist": ["Confirm the web service and access-log path", "Check file ownership and readability", "Verify the Wazuh agent is collecting new events", "Restore logging without deleting existing evidence"]
     }
   }
 }

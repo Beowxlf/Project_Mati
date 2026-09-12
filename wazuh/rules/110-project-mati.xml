@@ -1,49 +1,119 @@
 <!-- Project_Mati reviewed-native Wazuh rules. Raw telemetry remains in Wazuh. -->
 <group name="project_mati,">
   <rule id="110100" level="0">
-    <if_sid>60103</if_sid>
-    <field name="win.system.eventID">^4688$</field>
+    <if_sid>60103</if_sid><field name="win.system.eventID">^4688$</field>
     <field name="win.eventdata.newProcessName" type="pcre2">(?i)\\(?:powershell|pwsh)\.exe$</field>
-    <description>Project_Mati PowerShell process candidate</description>
-    <options>no_log</options>
+    <description>Project_Mati PowerShell process candidate</description><options>no_log</options>
   </rule>
-
   <rule id="110101" level="12">
-    <if_sid>110100</if_sid>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:^|\s)-(?:enc|encodedcommand)(?:\s|$)|DownloadString.{0,512}(?:Invoke-Expression|IEX)</field>
+    <if_sid>110100</if_sid><field name="win.eventdata.commandLine" type="pcre2">(?i)(?:^|\s)-(?:enc|encodedcommand)(?:\s|$)|DownloadString.{0,512}(?:Invoke-Expression|IEX)</field>
     <description>PM-WIN-PS-001 v1.0.0 Suspicious PowerShell encoded or download execution</description>
-    <mitre><id>T1059.001</id></mitre>
-    <group>project_mati,powershell,execution,</group>
+    <mitre><id>T1059.001</id></mitre><group>project_mati,powershell,execution,</group>
   </rule>
-
   <rule id="110110" level="0">
-    <if_sid>61100</if_sid>
-    <field name="win.system.eventID">^7045$</field>
-    <description>Project_Mati service creation candidate</description>
-    <options>no_log</options>
+    <if_sid>61100</if_sid><field name="win.system.eventID">^7045$</field>
+    <description>Project_Mati service creation candidate</description><options>no_log</options>
   </rule>
-
   <rule id="110111" level="12">
-    <if_sid>110110</if_sid>
-    <field name="win.eventdata.serviceFileName" type="pcre2">(?i)\\(?:Users\\Public|AppData\\Local\\Temp|Windows\\Temp|ADMIN\$)\\|\\(?:powershell|cmd|rundll32)\.exe(?:\s|$)</field>
+    <if_sid>110110</if_sid><field name="win.eventdata.serviceFileName" type="pcre2">(?i)\\(?:Users\\Public|AppData\\Local\\Temp|Windows\\Temp|ADMIN\$)\\|\\(?:powershell|cmd|rundll32)\.exe(?:\s|$)</field>
     <description>PM-WIN-SVC-001 v1.0.0 Suspicious Windows service image path</description>
-    <mitre><id>T1543.003</id></mitre>
-    <group>project_mati,windows_service,persistence,privilege_escalation,</group>
+    <mitre><id>T1543.003</id></mitre><group>project_mati,windows_service,persistence,privilege_escalation,</group>
   </rule>
-
   <rule id="110121" level="14">
-    <if_sid>110100</if_sid>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:Set-MpPreference\s+-Disable(?:Realtime|Behavior)Monitoring\s+\$true|(?:Add|Set)-MpPreference\s+-ExclusionPath\s+C:\\(?:\s|$))</field>
+    <if_sid>110100</if_sid><field name="win.eventdata.commandLine" type="pcre2">(?i)(?:Set-MpPreference\s+-Disable(?:Realtime|Behavior)Monitoring\s+\$true|(?:Add|Set)-MpPreference\s+-ExclusionPath\s+C:\\(?:\s|$))</field>
     <description>PM-WIN-DEF-001 v1.0.0 Microsoft Defender protection reduction command</description>
-    <mitre><id>T1562.001</id></mitre>
-    <group>project_mati,defender,defense_evasion,</group>
+    <mitre><id>T1562.001</id></mitre><group>project_mati,defender,defense_evasion,</group>
+  </rule>
+  <rule id="110131" level="12">
+    <if_sid>5400</if_sid><regex type="pcre2">(?i)^(?!.*\b(?:northgate-mcp|northgate-bootstrap)\s*:).*USER=root\s*;.*COMMAND=(?:/bin/(?:ba)?sh|/usr/bin/dash)(?:\s|$)|^(?!.*\b(?:northgate-mcp|northgate-bootstrap)\s*:).*USER=root\s*;.*COMMAND=/usr/bin/(?:chmod\s+u\+s|chown\s+root)(?:\s|$)</regex>
+    <description>PM-LNX-PRIV-001 v1.0.2 Sudo starts a root shell or changes privileged file ownership</description>
+    <mitre><id>T1548.003</id></mitre><group>project_mati,sudo,privilege_escalation,</group>
   </rule>
 
-  <rule id="110131" level="12">
-    <if_sid>5400</if_sid>
-    <regex type="pcre2">(?i)USER=root\s*;.*COMMAND=(?:/bin/(?:ba)?sh|/usr/bin/dash)(?:\s|$)|USER=root\s*;.*COMMAND=/usr/bin/(?:chmod\s+u\+s|chown\s+root)(?:\s|$)</regex>
-    <description>PM-LNX-PRIV-001 v1.0.0 Sudo starts a root shell or changes privileged file ownership</description>
-    <mitre><id>T1548.003</id></mitre>
-    <group>project_mati,sudo,privilege_escalation,</group>
+  <!-- Normalized JSON access logs from Caddy and nginx. -->
+  <rule id="110200" level="0">
+    <decoded_as>json</decoded_as><field name="request.method" type="pcre2">(?i)^(?:GET|HEAD|OPTIONS|POST|PUT|PATCH|DELETE)$</field>
+    <field name="request.remote_ip" type="pcre2">^.+$</field>
+    <description>Project_Mati normalized web request candidate</description><options>no_log</options>
+  </rule>
+  <rule id="110201" level="10">
+    <if_sid>110200</if_sid><field name="request.uri" type="pcre2">(?i)(?:^|/)(?:\.env(?:\.|/|$)|\.git(?:/|$)|wp-config\.php(?:$|\?)|server-status(?:$|\?)|actuator/(?:env|heapdump)|WEB-INF/web\.xml|\.aws/credentials)</field>
+    <description>PM-WEB-A02-001 v1.0.0 Sensitive configuration or diagnostic endpoint probe</description>
+    <mitre><id>T1595.002</id></mitre><group>project_mati,web,owasp_2025_a02,security_misconfiguration,</group>
+  </rule>
+  <rule id="110202" level="3" noalert="1">
+    <if_sid>110200</if_sid><field name="request.uri" type="pcre2">(?i)^/(?:admin|administrator|manage|management|internal|api/(?:admin|management|internal))(?:/|$|\?)</field>
+    <status type="pcre2">^(?:401|403|404)$</status><description>Project_Mati restricted endpoint access candidate</description><group>project_mati,web_candidate,</group>
+  </rule>
+  <rule id="110203" level="10" frequency="6" timeframe="120">
+    <if_matched_sid>110202</if_matched_sid><same_field>request.remote_ip</same_field>
+    <description>PM-WEB-A01-001 v1.0.0 Repeated denied access to restricted application endpoints</description>
+    <mitre><id>T1190</id></mitre><group>project_mati,web,owasp_2025_a01,broken_access_control,</group>
+  </rule>
+  <rule id="110204" level="12">
+    <if_sid>110200</if_sid><field name="request.uri" type="pcre2">(?i)^/(?:login|signin|auth|oauth|token|session|admin|api/(?:auth|token|session|admin))(?:/|$|\?)</field>
+    <field name="request.tls.version" type="pcre2">^(?:769|770|TLSv1|TLSv1\.1)$</field>
+    <description>PM-WEB-A04-001 v1.0.0 Weak TLS protocol used for a sensitive endpoint</description><group>project_mati,web,owasp_2025_a04,cryptographic_failures,</group>
+  </rule>
+  <rule id="110205" level="12">
+    <if_sid>110200</if_sid><field name="request.uri" type="pcre2">(?i)(?:\bunion(?:%20|\+|\s)+select\b|(?:%27|'|%22|")(?:%20|\+|\s)*(?:or|and)(?:%20|\+|\s)+(?:1=1|true)\b|(?:\.\./|%2e%2e(?:%2f|/))|(?:;|%3b)(?:%20|\+|\s)*(?:cat|id|whoami|curl|wget)(?:%20|\+|\s)|(?:%3c|&lt;)script(?:%3e|&gt;))</field>
+    <description>PM-WEB-A05-001 v1.0.0 High-confidence injection or traversal pattern in a web request</description>
+    <mitre><id>T1190</id></mitre><group>project_mati,web,owasp_2025_a05,injection,</group>
+  </rule>
+  <rule id="110206" level="3" noalert="1">
+    <if_sid>110200</if_sid><field name="request.method" type="pcre2">(?i)^(?:POST|PUT|PATCH|DELETE)$</field>
+    <field name="request.uri" type="pcre2">(?i)^/(?:admin|api/admin|api/(?:bulk|export|import|reset|users|roles|permissions))(?:/|$|\?)</field>
+    <status type="pcre2">^2\d\d$</status><description>Project_Mati successful privileged state-changing operation candidate</description><group>project_mati,web_candidate,</group>
+  </rule>
+  <rule id="110207" level="10" frequency="20" timeframe="60">
+    <if_matched_sid>110206</if_matched_sid><same_field>request.remote_ip</same_field>
+    <description>PM-WEB-A06-001 v1.0.0 Burst of successful privileged or bulk state changes</description>
+    <mitre><id>T1190</id></mitre><group>project_mati,web,owasp_2025_a06,insecure_design,</group>
+  </rule>
+  <rule id="110208" level="3" noalert="1">
+    <if_sid>110200</if_sid><field name="request.uri" type="pcre2">(?i)^/(?:login|signin|auth|oauth|token|session|api/(?:auth|token|session))(?:/|$|\?)</field>
+    <status type="pcre2">^(?:401|403)$</status><description>Project_Mati authentication failure candidate</description><group>project_mati,web_candidate,</group>
+  </rule>
+  <rule id="110209" level="10" frequency="6" timeframe="120">
+    <if_matched_sid>110208</if_matched_sid><same_field>request.remote_ip</same_field>
+    <description>PM-WEB-A07-001 v1.0.0 Repeated authentication failures from one source</description>
+    <mitre><id>T1110</id></mitre><group>project_mati,web,owasp_2025_a07,authentication_failures,</group>
+  </rule>
+  <rule id="110210" level="3" noalert="1">
+    <if_sid>110200</if_sid><status type="pcre2">^5\d\d$</status><description>Project_Mati server error candidate</description><group>project_mati,web_candidate,</group>
+  </rule>
+  <rule id="110211" level="12" frequency="5" timeframe="120">
+    <if_matched_sid>110210</if_matched_sid><same_field>request.remote_ip</same_field>
+    <description>PM-WEB-A10-001 v1.0.0 Repeated server errors associated with one request source</description>
+    <mitre><id>T1499</id></mitre><group>project_mati,web,owasp_2025_a10,exceptional_conditions,</group>
+  </rule>
+
+  <!-- Sysmon for Linux website-server telemetry. -->
+  <rule id="110220" level="0"><decoded_as>sysmon-linux</decoded_as><description>Project_Mati Sysmon for Linux event</description><options>no_log</options></rule>
+  <rule id="110221" level="10">
+    <if_sid>110220</if_sid><field name="system.eventId">^11$</field>
+    <field name="eventdata.targetFilename" type="pcre2">(?i)^/(?:opt|srv|var/www|rmm/api)/.+/(?:package(?:-lock)?\.json|requirements(?:-[^/]+)?\.txt|poetry\.lock|Pipfile(?:\.lock)?|Gemfile(?:\.lock)?|composer\.(?:json|lock)|go\.(?:mod|sum)|Cargo\.(?:toml|lock)|vendor/|node_modules/)</field>
+    <field name="eventdata.image" type="pcre2">(?i)/(?:curl|wget|npm|npx|yarn|pnpm|pip|pip3|poetry|gem|bundle|composer|go|cargo|bash|sh|python3?|node)$</field>
+    <description>PM-WEB-A03-001 v1.0.0 Dependency or release artifact changed by a monitored tool</description>
+    <mitre><id>T1195.002</id></mitre><group>project_mati,web,sysmon_linux,owasp_2025_a03,software_supply_chain,</group>
+  </rule>
+  <rule id="110222" level="12">
+    <if_sid>110220</if_sid><field name="system.eventId">^11$</field>
+    <field name="eventdata.targetFilename" type="pcre2">(?i)^/(?:etc/(?:nginx|caddy|wazuh-agent)|opt|srv|var/www|rmm/api)/(?!.*(?:access[_-]?log|error[_-]?log|logrotate|ossec|sysmon)).*(?:auth|oauth|session|permission|role|access|middleware|security|policy|caddy|nginx).*$</field>
+    <field name="eventdata.image" type="pcre2">(?i)/(?:bash|sh|dash|zsh|vi|vim|nano|sed|perl|python3?|node|curl|wget|cp|mv|install|tee)$</field>
+    <description>PM-WEB-A08-001 v1.0.0 Security-sensitive website code or configuration changed by a monitored tool</description>
+    <mitre><id>T1554</id></mitre><group>project_mati,web,sysmon_linux,owasp_2025_a08,software_data_integrity,</group>
+  </rule>
+  <rule id="110223" level="12">
+    <if_sid>110220</if_sid><field name="system.eventId">^11$</field>
+    <field name="eventdata.targetFilename" type="pcre2">(?i)^/(?:etc/(?:rsyslog|logrotate|wazuh-agent|sysmon)|var/ossec/etc|etc/(?:nginx|caddy))/.*(?:log|ossec|sysmon).*$</field>
+    <field name="eventdata.image" type="pcre2">(?i)/(?:bash|sh|dash|zsh|vi|vim|nano|sed|perl|python3?|cp|mv|install|tee|truncate)$</field>
+    <description>PM-WEB-A09-001 v1.0.0 Website security logging configuration changed by a monitored tool</description>
+    <mitre><id>T1562.001</id></mitre><group>project_mati,web,sysmon_linux,owasp_2025_a09,logging_alerting_failures,</group>
+  </rule>
+  <rule id="110230" level="12">
+    <decoded_as>json</decoded_as><field name="project_mati.event">^web_log_health$</field><field name="healthy">^false$</field>
+    <description>PM-WEB-A09-001 v1.0.0 Website access-log health check failed</description>
+    <mitre><id>T1562.001</id></mitre><group>project_mati,web,owasp_2025_a09,logging_alerting_failures,</group>
   </rule>
 </group>

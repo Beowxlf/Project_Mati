@@ -1,0 +1,12 @@
+[Unit]
+Description=Delayed and periodic Sysmon for Linux start check
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+RandomizedDelaySec=15s
+Unit=project-mati-sysmon-start.service
+
+[Install]
+WantedBy=timers.target
+

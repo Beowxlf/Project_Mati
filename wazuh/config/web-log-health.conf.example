@@ -1,0 +1,4 @@
+PROJECT_MATI_SERVER=NG-HR-APP01
+PROJECT_MATI_SERVICE=caddy.service
+PROJECT_MATI_ACCESS_LOG=/var/log/caddy/employee-hub-access.json
+PROJECT_MATI_SYSMON_SERVICE=sysmon

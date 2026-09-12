@@ -23,9 +23,10 @@ detection:
   condition: sudo_root and command
 falsepositives:
   - Approved emergency maintenance that explicitly starts a root shell
+  - NorthGate automation identities northgate-mcp and northgate-bootstrap are explicitly excluded
 level: high
 tags:
   - attack.privilege_escalation
   - attack.t1548.003
 x_detection_id: PM-LNX-PRIV-001
-x_detection_version: 1.0.0
+x_detection_version: 1.0.2
